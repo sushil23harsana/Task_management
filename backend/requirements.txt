@@ -10,3 +10,4 @@ requests==2.31.0
 python-dotenv==1.0.1
 gunicorn==21.2.0
 Pillow==10.4.0
+setuptools==80.2.0

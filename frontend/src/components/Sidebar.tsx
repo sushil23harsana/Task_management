@@ -14,13 +14,12 @@ import {
   User,
   LogOut,
   Share,
-  Lightbulb,
 } from 'lucide-react';
 
-const Sidebar = ({ isOpen, setIsOpen }) => {
-  const { user, logout } = useAuth();
+const Sidebar = ({ isOpen, setIsOpen }) => {  const { user, logout } = useAuth();
   const { isDarkMode, toggleTheme } = useTheme();
   const location = useLocation();
+  
   const navigation = [
     {
       name: 'To-do',
@@ -42,10 +41,10 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       current: location.pathname.startsWith('/analytics'),
     },
     {
-      name: 'Leaderboard',
-      href: '/leaderboard',
-      icon: Lightbulb,
-      current: location.pathname.startsWith('/leaderboard'),
+      name: 'Calendar',
+      href: '/calendar',
+      icon: Calendar,
+      current: location.pathname.startsWith('/calendar'),
     },
   ];
 
@@ -205,12 +204,10 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                     Logout
                   </button>
                 </div>
-              )}
-
-              {/* Upgrade section */}
+              )}              {/* Upgrade section */}
               <div className="mt-4 p-4 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg text-white">
                 <div className="flex items-center mb-2">
-                  <Lightbulb className="w-5 h-5 mr-2" />
+                  <Settings className="w-5 h-5 mr-2" />
                   <span className="font-semibold">Upgrade plan</span>
                 </div>
                 <p className="text-sm text-primary-100 mb-3">

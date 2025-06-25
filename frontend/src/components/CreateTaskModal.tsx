@@ -31,6 +31,7 @@ interface CreateTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
   onTaskCreated: (task: any) => void;
+  defaultDate?: string;
 }
 
 const schema = yup.object({
@@ -42,7 +43,7 @@ const schema = yup.object({
   category: yup.number()
 });
 
-const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose, onTaskCreated }) => {
+const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose, onTaskCreated, defaultDate }) => {
   const [categories, setCategories] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -52,7 +53,8 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose, onTa
     formState: { errors },
     reset,
     control,
-    watch
+    watch,
+    setValue
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -61,13 +63,14 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose, onTa
   });
 
   const selectedPriority = watch('priority');
-  const selectedCategory = watch('category');
-
-  useEffect(() => {
+  const selectedCategory = watch('category');  useEffect(() => {
     if (isOpen) {
       fetchCategories();
+      if (defaultDate) {
+        setValue('due_date', new Date(defaultDate));
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, defaultDate, setValue]);
 
   const fetchCategories = async () => {
     try {

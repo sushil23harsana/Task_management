@@ -1,13 +1,15 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import CssBaseline from '@mui/material/CssBaseline';
 import { AuthProvider } from './context/AuthContext';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './pages/Dashboard';
 // import Analytics from './pages/Analytics';
-import Leaderboard from './pages/Leaderboard';
+import Calendar from './pages/Calendar';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Test from './pages/Test';
@@ -38,8 +40,9 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <Router>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <CssBaseline />
+            <Router>
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
@@ -52,10 +55,11 @@ function App() {
                 <Route index element={<Navigate to="/dashboard" replace />} />
                 <Route path="dashboard" element={<Dashboard />} />
                 {/* <Route path="analytics" element={<Analytics />} /> */}
-                <Route path="leaderboard" element={<Leaderboard />} />
+                <Route path="calendar" element={<Calendar />} />
               </Route>
             </Routes>
           </Router>
+          </LocalizationProvider>
         </ThemeProvider>
       </AuthProvider>
     </QueryClientProvider>

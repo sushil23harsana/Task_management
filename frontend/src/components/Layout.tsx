@@ -18,7 +18,7 @@ import {
 import {
   Dashboard,
   Analytics,
-  Leaderboard,
+  CalendarMonth,
   Settings,
   Logout,
 } from '@mui/icons-material';
@@ -30,11 +30,10 @@ const Layout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
-
   const menuItems = [
     { text: 'Dashboard', icon: <Dashboard />, path: '/dashboard' },
     { text: 'Analytics', icon: <Analytics />, path: '/analytics' },
-    { text: 'Leaderboard', icon: <Leaderboard />, path: '/leaderboard' },
+    { text: 'Calendar', icon: <CalendarMonth />, path: '/calendar' },
   ];
 
   const handleLogout = async () => {

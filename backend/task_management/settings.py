@@ -203,8 +203,12 @@ CORS_ALLOWED_HEADERS = [
     'x-requested-with',
 ]
 
-# Google Gemini AI Configuration
+# AI Configuration
+# Google Gemini AI Configuration (Legacy)
 GEMINI_API_KEY = config('GEMINI_API_KEY', default='')
+
+# Mistral AI Configuration
+MISTRAL_API_KEY = config('MISTRAL_API_KEY', default='')
 
 # Custom User Model
 AUTH_USER_MODEL = 'accounts.CustomUser'

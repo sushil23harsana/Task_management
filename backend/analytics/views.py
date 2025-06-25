@@ -12,7 +12,7 @@ from .serializers import (
     AnalyticsOverviewSerializer, AIRecommendationSerializer, AIInsightFeedbackSerializer,
     FocusSessionCreateSerializer
 )
-from .gemini_ai import GeminiAnalytics
+from .mistral_ai import MistralAnalytics
 from tasks.models import Task
 
 class UserAnalyticsView(generics.RetrieveUpdateAPIView):
@@ -132,10 +132,10 @@ class GenerateAIInsightsView(APIView):
                 'actual_duration': task.actual_duration,
             })
         
-        # Generate AI insights using Gemini
+        # Generate AI insights using Mistral
         try:
-            gemini_ai = GeminiAnalytics()
-            analysis_result = gemini_ai.analyze_task_productivity(task_data)
+            mistral_ai = MistralAnalytics()
+            analysis_result = mistral_ai.analyze_task_productivity(task_data)
             
             if 'error' not in analysis_result:
                 # Create AI insight record
@@ -210,13 +210,13 @@ class ProductivityDashboardView(APIView):
         
         # Get AI recommendations
         try:
-            gemini_ai = GeminiAnalytics()
+            mistral_ai = MistralAnalytics()
             user_context = {
                 'recent_tasks': list(Task.objects.filter(user=user).order_by('-created_at')[:10].values('title', 'priority')),
                 'categories': list(Task.objects.filter(user=user, category__isnull=False).values_list('category__name', flat=True).distinct()),
                 'current_time': 'morning' if timezone.now().hour < 12 else 'afternoon' if timezone.now().hour < 18 else 'evening'
             }
-            recommendations = gemini_ai.generate_task_suggestions(user_context)
+            recommendations = mistral_ai.generate_task_suggestions(user_context)
         except:
             recommendations = ["Take a short break", "Review your goals", "Plan tomorrow's priorities"]
         
@@ -313,7 +313,7 @@ def generate_task_suggestions(request):
     user = request.user
     
     try:
-        gemini_ai = GeminiAnalytics()
+        mistral_ai = MistralAnalytics()
         
         # Prepare user context
         recent_tasks = Task.objects.filter(user=user).order_by('-created_at')[:10]
@@ -325,7 +325,7 @@ def generate_task_suggestions(request):
             'current_time': 'morning' if timezone.now().hour < 12 else 'afternoon' if timezone.now().hour < 18 else 'evening'
         }
         
-        suggestions = gemini_ai.generate_task_suggestions(user_context)
+        suggestions = mistral_ai.generate_task_suggestions(user_context)
         
         return Response({
             'suggestions': suggestions,

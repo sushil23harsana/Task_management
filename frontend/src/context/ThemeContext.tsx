@@ -12,23 +12,17 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
-    // Check localStorage first, then system preference
+    // Check localStorage first, then default to light mode
     const saved = localStorage.getItem('theme');
     if (saved) {
       return saved === 'dark';
     }
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return false; // Default to light mode (white background)
   });
 
   useEffect(() => {
-    // Apply theme to document
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
+    // Save theme preference to localStorage
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
 
   const toggleTheme = () => {
@@ -52,10 +46,10 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   );
 };
 
-export const useTheme = (): ThemeContextType => {
+export const useCustomTheme = (): ThemeContextType => {
   const context = useContext(ThemeContext);
   if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider');
+    throw new Error('useCustomTheme must be used within a ThemeProvider');
   }
   return context;
 };

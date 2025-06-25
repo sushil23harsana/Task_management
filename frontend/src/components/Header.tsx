@@ -1,10 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, Bell, Search, Settings } from 'lucide-react';
+import { 
+  AppBar, 
+  Toolbar, 
+  Typography, 
+  Box, 
+  TextField, 
+  InputAdornment, 
+  IconButton, 
+  Avatar, 
+  Badge,
+  useTheme as useMUITheme
+} from '@mui/material';
+import { 
+  Menu as MenuIcon, 
+  Search as SearchIcon, 
+  Notifications as NotificationsIcon, 
+  Settings as SettingsIcon, 
+  Brightness4 as DarkModeIcon, 
+  Brightness7 as LightModeIcon 
+} from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext.tsx';
+import { useCustomTheme } from '../context/ThemeContext.tsx';
 import { authService } from '../services/auth.ts';
 
 const Header = ({ onMenuClick }) => {
   const { user } = useAuth();
+  const { isDarkMode, toggleTheme } = useCustomTheme();
+  const muiTheme = useMUITheme();
   const [greeting, setGreeting] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -30,94 +52,166 @@ const Header = ({ onMenuClick }) => {
   }, [user]);
 
   return (
-    <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-4">
-          {/* Left side */}
-          <div className="flex items-center">
-            {/* Mobile menu button */}
-            <button
-              type="button"
-              className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
-              onClick={onMenuClick}
+    <AppBar 
+      position="static" 
+      color="inherit" 
+      elevation={1}
+      sx={{ 
+        backgroundColor: muiTheme.palette.background.paper,
+        borderBottom: `1px solid ${muiTheme.palette.divider}`
+      }}
+    >
+      <Toolbar sx={{ justifyContent: 'space-between', py: 1 }}>
+        {/* Left side */}
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          {/* Mobile menu button */}
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="open drawer"
+            onClick={onMenuClick}
+            sx={{ 
+              mr: 2, 
+              display: { lg: 'none' }
+            }}
+          >
+            <MenuIcon />
+          </IconButton>
+
+          {/* Greeting */}
+          <Box sx={{ ml: { xs: 0, lg: 0 } }}>
+            <Typography 
+              variant="h5" 
+              component="h1" 
+              sx={{ 
+                fontWeight: 'bold',
+                color: muiTheme.palette.text.primary
+              }}
             >
-              <span className="sr-only">Open main menu</span>
-              <Menu className="w-6 h-6" />
-            </button>
+              {greeting}
+            </Typography>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: muiTheme.palette.text.secondary,
+                mt: 0.5
+              }}
+            >
+              What do you plan to do today?
+            </Typography>
+          </Box>
+        </Box>
 
-            {/* Greeting */}
-            <div className="ml-4 lg:ml-0">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                {greeting}
-              </h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                What do you plan to do today?
-              </p>
-            </div>
-          </div>
+        {/* Right side */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {/* Search */}
+          <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+            <TextField
+              size="small"
+              placeholder="Search tasks..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ color: muiTheme.palette.text.secondary }} />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{ 
+                width: 300,
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: muiTheme.palette.background.default,
+                }
+              }}
+            />
+          </Box>
 
-          {/* Right side */}
-          <div className="flex items-center space-x-4">
-            {/* Search */}
-            <div className="hidden md:block">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  placeholder="Search tasks..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                />
-              </div>
-            </div>
+          {/* User info and actions */}
+          {user && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              {/* User info */}
+              <Box sx={{ 
+                textAlign: 'right', 
+                display: { xs: 'none', sm: 'block' },
+                mr: 1
+              }}>
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    fontWeight: 'medium',
+                    color: muiTheme.palette.text.primary
+                  }}
+                >
+                  {user.first_name} {user.last_name}
+                </Typography>
+                <Typography 
+                  variant="caption" 
+                  sx={{ 
+                    color: muiTheme.palette.text.secondary
+                  }}
+                >
+                  1,354 pts
+                </Typography>
+              </Box>
+              
+              {/* Avatar */}
+              <Avatar 
+                sx={{ 
+                  bgcolor: muiTheme.palette.primary.main,
+                  width: 40,
+                  height: 40,
+                  fontSize: '0.875rem'
+                }}
+              >
+                {user.first_name?.[0]}{user.last_name?.[0]}
+              </Avatar>
 
-            {/* User info and avatar */}
-            {user && (
-              <div className="flex items-center space-x-3">
-                {/* User avatar and info */}
-                <div className="flex items-center space-x-3">
-                  <div className="text-right hidden sm:block">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {user.first_name} {user.last_name}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      1,354 pts
-                    </p>
-                  </div>
-                  
-                  {/* Avatar */}
-                  <div className="relative">
-                    <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white font-semibold">
-                      {user.first_name?.[0]}{user.last_name?.[0]}
-                    </div>
-                    {/* Status icons */}
-                    <div className="absolute -top-1 -right-1 flex space-x-1">
-                      <span className="inline-block w-3 h-3 text-xs">🥳</span>
-                      <span className="inline-block w-3 h-3 text-xs">😊</span>
-                      <span className="inline-block w-3 h-3 text-xs">😠</span>
-                      <span className="inline-block w-3 h-3 text-xs">😈</span>
-                    </div>
-                  </div>
-                </div>
+              {/* Dark mode toggle */}
+              <IconButton
+                onClick={toggleTheme}
+                title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+                sx={{ 
+                  color: isDarkMode ? '#ffd700' : '#1976d2',
+                  backgroundColor: isDarkMode ? 'rgba(255, 215, 0, 0.1)' : 'rgba(25, 118, 210, 0.1)',
+                  border: isDarkMode ? '2px solid #ffd700' : '2px solid #1976d2',
+                  borderRadius: 2,
+                  width: 48,
+                  height: 48,
+                  '&:hover': {
+                    backgroundColor: isDarkMode ? 'rgba(255, 215, 0, 0.2)' : 'rgba(25, 118, 210, 0.2)',
+                    transform: 'scale(1.1)',
+                    boxShadow: isDarkMode ? '0 0 10px rgba(255, 215, 0, 0.3)' : '0 0 10px rgba(25, 118, 210, 0.3)',
+                  },
+                  transition: 'all 0.3s ease-in-out',
+                  mx: 1
+                }}
+              >
+                {isDarkMode ? <LightModeIcon fontSize="medium" /> : <DarkModeIcon fontSize="medium" />}
+              </IconButton>
 
-                {/* Notifications */}
-                <button className="p-2 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
-                  <Bell className="w-5 h-5" />
-                </button>
+              {/* Notifications */}
+              <IconButton 
+                color="inherit"
+                sx={{ color: muiTheme.palette.text.secondary }}
+              >
+                <Badge badgeContent={4} color="error">
+                  <NotificationsIcon />
+                </Badge>
+              </IconButton>
 
-                {/* Settings */}
-                <button className="p-2 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
-                  <Settings className="w-5 h-5" />
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </header>
+              {/* Settings */}
+              <IconButton 
+                color="inherit"
+                sx={{ color: muiTheme.palette.text.secondary }}
+              >
+                <SettingsIcon />
+              </IconButton>
+            </Box>
+          )}
+        </Box>
+      </Toolbar>
+    </AppBar>
   );
 };
 

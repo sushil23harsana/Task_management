@@ -33,6 +33,7 @@ const Dashboard = () => {
   const [projects, setProjects] = useState([]);
   const [stats, setStats] = useState(null);
   const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPriority, setSelectedPriority] = useState('');
@@ -81,6 +82,18 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Failed to delete task:', error);
     }
+  };
+
+  const handleTaskEdit = (task: any) => {
+    setEditingTask(task);
+  };
+
+  const handleTaskUpdated = (updatedTask: any) => {
+    setTasks(tasks.map(task => task.id === updatedTask.id ? updatedTask : task));
+    setTodayTasks(todayTasks.map(task => task.id === updatedTask.id ? updatedTask : task));
+    setEditingTask(null);
+    // Refresh stats to update the counters
+    fetchDashboardData();
   };
 
   const filteredTasks = todayTasks.filter(task => {
@@ -188,6 +201,7 @@ const Dashboard = () => {
                   task={task}
                   onUpdate={handleTaskUpdate}
                   onDelete={handleTaskDelete}
+                  onEdit={handleTaskEdit}
                 />
               ))}
             </Box>
@@ -203,9 +217,13 @@ const Dashboard = () => {
           )}
         </CardContent>
       </Card>      <CreateTaskModal
-        isOpen={isCreateTaskModalOpen}
-        onClose={() => setIsCreateTaskModalOpen(false)}
-        onTaskCreated={handleTaskCreate}
+        isOpen={isCreateTaskModalOpen || !!editingTask}
+        onClose={() => {
+          setIsCreateTaskModalOpen(false);
+          setEditingTask(null);
+        }}
+        onTaskCreated={editingTask ? handleTaskUpdated : handleTaskCreate}
+        editingTask={editingTask}
       /></Box>
   );
 };

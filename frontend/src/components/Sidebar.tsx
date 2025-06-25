@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.tsx';
-import { useTheme } from '../context/ThemeContext.tsx';
+import { useCustomTheme } from '../context/ThemeContext.tsx';
 import {
   CheckSquare,
   BarChart3,
   Calendar,
+  Timer,
   Settings,
   Sun,
   Moon,
@@ -17,7 +18,7 @@ import {
 } from 'lucide-react';
 
 const Sidebar = ({ isOpen, setIsOpen }) => {  const { user, logout } = useAuth();
-  const { isDarkMode, toggleTheme } = useTheme();
+  const { isDarkMode, toggleTheme } = useCustomTheme();
   const location = useLocation();
   
   const navigation = [
@@ -28,11 +29,10 @@ const Sidebar = ({ isOpen, setIsOpen }) => {  const { user, logout } = useAuth()
       current: location.pathname.startsWith('/dashboard'),
     },
     {
-      name: 'Share My Impact',
-      href: '/share',
-      icon: Share,
-      current: location.pathname.startsWith('/share'),
-      badge: 'OFF'
+      name: 'Focus Timer',
+      href: '/focus-timer',
+      icon: Timer,
+      current: location.pathname.startsWith('/focus-timer'),
     },
     {
       name: 'Analytics',
@@ -46,7 +46,16 @@ const Sidebar = ({ isOpen, setIsOpen }) => {  const { user, logout } = useAuth()
       icon: Calendar,
       current: location.pathname.startsWith('/calendar'),
     },
-  ];
+  ] as Array<{
+    name: string;
+    href: string;
+    icon: any;
+    current: boolean;
+    badge?: string;
+  }>;
+
+  // Debug: Log navigation items
+  console.log('Navigation items:', navigation.map(item => item.name));
 
   const projects = [
     { name: 'Odama Website', icon: '🔥', color: 'text-orange-500' },

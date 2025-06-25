@@ -19,6 +19,7 @@ import {
   Dashboard,
   Analytics,
   CalendarMonth,
+  Timer,
   Settings,
   Logout,
 } from '@mui/icons-material';
@@ -32,6 +33,7 @@ const Layout: React.FC = () => {
   const { user, logout } = useAuth();
   const menuItems = [
     { text: 'Dashboard', icon: <Dashboard />, path: '/dashboard' },
+    { text: 'Focus Timer', icon: <Timer />, path: '/focus-timer' },
     { text: 'Analytics', icon: <Analytics />, path: '/analytics' },
     { text: 'Calendar', icon: <CalendarMonth />, path: '/calendar' },
   ];

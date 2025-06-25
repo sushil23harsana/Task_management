@@ -34,10 +34,11 @@ interface TaskCardProps {
   task: Task;
   onUpdate: any;
   onDelete: any;
+  onEdit?: (task: Task) => void;
   className?: string;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdate, onDelete, className = '' }) => {
+const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdate, onDelete, onEdit, className = '' }) => {
   const [isCompleting, setIsCompleting] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -92,6 +93,11 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdate, onDelete, className
 
   const handleDelete = () => {
     onDelete && onDelete(task.id);
+    handleMenuClose();
+  };
+
+  const handleEdit = () => {
+    onEdit && onEdit(task);
     handleMenuClose();
   };
 
@@ -166,6 +172,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdate, onDelete, className
               sx: { minWidth: 120 }
             }}
           >
+            <MenuItem onClick={handleEdit}>Edit</MenuItem>
             <MenuItem onClick={handleDelete}>Delete</MenuItem>
           </Menu>
         </Box>

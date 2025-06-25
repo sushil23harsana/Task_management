@@ -31,6 +31,7 @@ interface CreateTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
   onTaskCreated: (task: any) => void;
+  editingTask?: any;
   defaultDate?: string;
 }
 
@@ -43,7 +44,7 @@ const schema = yup.object({
   category: yup.number()
 });
 
-const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose, onTaskCreated, defaultDate }) => {
+const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose, onTaskCreated, editingTask, defaultDate }) => {
   const [categories, setCategories] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -66,11 +67,22 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose, onTa
   const selectedCategory = watch('category');  useEffect(() => {
     if (isOpen) {
       fetchCategories();
-      if (defaultDate) {
+      
+      if (editingTask) {
+        // Populate form with editing task data
+        setValue('title', editingTask.title);
+        setValue('description', editingTask.description || '');
+        setValue('priority', editingTask.priority);
+        setValue('estimated_hours', editingTask.estimated_hours || 0);
+        setValue('category', editingTask.category?.id || '');
+        if (editingTask.due_date) {
+          setValue('due_date', new Date(editingTask.due_date));
+        }
+      } else if (defaultDate) {
         setValue('due_date', new Date(defaultDate));
       }
     }
-  }, [isOpen, defaultDate, setValue]);
+  }, [isOpen, editingTask, defaultDate, setValue]);
 
   const fetchCategories = async () => {
     try {
@@ -89,11 +101,19 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose, onTa
         due_date: data.due_date ? format(new Date(data.due_date), 'yyyy-MM-dd') : null
       };
       
-      const newTask = await taskService.createTask(taskData);
-      onTaskCreated && onTaskCreated(newTask);
+      let result;
+      if (editingTask) {
+        // Update existing task
+        result = await taskService.updateTask(editingTask.id, taskData);
+      } else {
+        // Create new task
+        result = await taskService.createTask(taskData);
+      }
+      
+      onTaskCreated && onTaskCreated(result);
       handleClose();
     } catch (error) {
-      console.error('Failed to create task:', error);
+      console.error(`Failed to ${editingTask ? 'update' : 'create'} task:`, error);
     } finally {
       setIsSubmitting(false);
     }
@@ -126,7 +146,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose, onTa
       <DialogTitle>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="h6" component="div">
-            Create New Task
+            {editingTask ? 'Edit Task' : 'Create New Task'}
           </Typography>
           <IconButton 
             edge="end" 
@@ -233,7 +253,15 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose, onTa
                     {categories.map((category: any) => (
                       <MenuItem key={category.id} value={category.id}>
                         <Box display="flex" alignItems="center" gap={1}>
-                          <LabelIcon sx={{ fontSize: 16, color: 'action.active' }} />
+                          <Box
+                            sx={{
+                              width: 16,
+                              height: 16,
+                              borderRadius: '50%',
+                              backgroundColor: category.color || '#3B82F6',
+                            }}
+                          />
+                          {category.icon && <span style={{ fontSize: '16px' }}>{category.icon}</span>}
                           {category.name}
                         </Box>
                       </MenuItem>
@@ -262,7 +290,10 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose, onTa
             },
           }}
         >
-          {isSubmitting ? 'Creating...' : 'Create Task'}
+          {isSubmitting 
+            ? (editingTask ? 'Updating...' : 'Creating...') 
+            : (editingTask ? 'Update Task' : 'Create Task')
+          }
         </Button>
       </DialogActions>
     </Dialog>
